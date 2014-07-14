@@ -41,7 +41,7 @@ def git_push(path=None):
 
 if __name__ == '__main__':
     HOME_DIR = '/home/ycao'
-    path_list = [ '/Documents/Python Study',
+    path_list = [ '/Documents/Python-Study',
                   '/Documents/jekyll-blog',
                   ]
     target_file = '/Documents/jekyll-blog/_posts/2014-07-12-github-streak-savor.md'
