@@ -41,9 +41,8 @@ def git_push(path=None):
 
 if __name__ == '__main__':
     HOME_DIR = '/home/ycao'
-    path_list = [ '/Documents/Python-Study',
-                  '/Documents/jekyll-blog',
-                  ]
+    path_list = ['/Documents/Python-Study',
+                 '/Documents/jekyll-blog',]
     target_file = '/Documents/jekyll-blog/_posts/2014-07-12-github-streak-savor.md'
     target_path = HOME_DIR + target_file
     current = datetime.today()
@@ -51,6 +50,7 @@ if __name__ == '__main__':
     for p in path_list:
         path = HOME_DIR + p
         git_pull(path)
+        print 'Pulled %s' % p
         git_time_str = git_last_mod(path)
         last_mod_time = datetime.strptime(git_time_str, '%Y-%m-%d')
         # Check if time diff
@@ -62,9 +62,11 @@ if __name__ == '__main__':
         tfile.write(str(current.date())+' ')
 
     git_add(target_path)
+    print 'Done with add'
     git_commit('Keep streak on %s' % str(current.date()), target_path)
+    print 'Done with commit'
     git_push(target_path)
-
+    print 'Done with push'
 # Todo:
 # 1. Move path to config file so directory wouldn't expose to public
 # 2. Write Cron job template
