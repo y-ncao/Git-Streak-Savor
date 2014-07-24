@@ -1,72 +1,50 @@
 #!/usr/bin/env python
 
-import subprocess
+import argparse
 import re
+import os
+from sh import git
 from datetime import datetime, timedelta
 
-def git_last_mod(path=None):
-    p = subprocess.Popen(['git', 'log', '-1', '--date=iso'], stdout=subprocess.PIPE, cwd=path)
-    out, err = p.communicate()
-    m = re.search('\d{4}-\d{2}-\d{2}', out)
-    return m.group(0)
+# Flag parser for either commit or abort
+parser = argparse.ArgumentParser(description='Save my github streak.')
+parser.add_argument('-c', '--commit', dest='commit', action='store_true',
+                    required=False, default=False, help='Actually commit the change (default: no)')
+args = parser.parse_args()
 
-def git_pull(path=None):
-    p = subprocess.Popen(['git', 'pull', 'origin', 'master'], stdout=subprocess.PIPE, cwd=path)
-    out, err = p.communicate()
-    if err is not None:
-        print 'Found Error in %s' % path
-    return err
+HOME_DIR = '/home/ycao'
+path_list = ['/Documents/Python_Study',
+             '/Documents/jekyll-blog',]
+target_file = '/Documents/jekyll-blog/_posts/2014-07-12-github-streak-savor.md'
+target_path = HOME_DIR + target_file
+current = datetime.today()
 
-def git_add(path=None):
-    p = subprocess.Popen(['git', 'add', path], stdout=subprocess.PIPE, cwd=path.rsplit('/',1)[0])
-    out, err = p.communicate()
-    if err is not None:
-        print 'Found Error in %s' % path
-    return err
+for p in path_list:
+    path = HOME_DIR + p
+    os.chdir(path)
+    git.pull('origin', 'master')
+    print 'Pulled %s' % p
 
-def git_commit(message, path=None):
-    p = subprocess.Popen(['git', 'commit', '-m', message], stdout=subprocess.PIPE, cwd=path.rsplit('/',1)[0])
-    out, err = p.communicate()
-    if err is not None:
-        print 'Found Error in %s' % path
-    return err
+    git_time_str = re.search('\d{4}-\d{2}-\d{2}', str(git.log('-1', '--date=iso'))).group(0) # Magic line
+    last_mod_time = datetime.strptime(git_time_str, '%Y-%m-%d')
+    # Check if time diff
+    if current.date() - last_mod_time.date() == timedelta(0):
+        print 'Found a new mod path %s, abort update' % p
+        exit(0)
 
-def git_push(path=None):
-    p = subprocess.Popen(['git', 'push', 'origin', 'master'], stdout=subprocess.PIPE, cwd=path.rsplit('/',1)[0])
-    out, err = p.communicate()
-    if err is not None:
-        print 'Found Error in %s' % path
-    return err
+with open(target_path, 'a') as tfile:
+    tfile.write(str(current.date())+' ')
+
+os.chdir(target_path.rsplit('/',1)[0])
 
 
-if __name__ == '__main__':
-    HOME_DIR = '/home/ycao'
-    path_list = ['/Documents/Python-Study',
-                 '/Documents/jekyll-blog',]
-    target_file = '/Documents/jekyll-blog/_posts/2014-07-12-github-streak-savor.md'
-    target_path = HOME_DIR + target_file
-    current = datetime.today()
-
-    for p in path_list:
-        path = HOME_DIR + p
-        git_pull(path)
-        print 'Pulled %s' % p
-        git_time_str = git_last_mod(path)
-        last_mod_time = datetime.strptime(git_time_str, '%Y-%m-%d')
-        # Check if time diff
-        if current.date() - last_mod_time.date() == timedelta(0):
-            print 'Found a new mod path %s, abort update' % p
-            exit(0)
-
-    with open(target_path, 'a') as tfile:
-        tfile.write(str(current.date())+' ')
-
-    git_add(target_path)
+if args.commit:
+    git.add(target_path)
     print 'Done with add'
-    git_commit('Keep streak on %s' % str(current.date()), target_path)
+    git.commit('-m', 'Keep streak on %s' % str(current.date()))
     print 'Done with commit'
-    git_push(target_path)
+    git.push('origin', 'master')
     print 'Done with push'
-# Todo:
-# 1. Move path to config file so directory wouldn't expose to public
-# 2. Write Cron job template
+else:
+    git.checkout(target_path)
+    print 'Aborted and reverted'
