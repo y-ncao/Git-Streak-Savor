@@ -50,14 +50,14 @@ os.chdir(target_path.rsplit('/',1)[0])
 
 
 if args.commit:
-    logging.debug(str(git.add(target_path)))
+    git.add(target_path)
     logging.info('Done with add')
     logging.debug(str(git.commit('-m', 'Keep streak on %s' % str(current.date()))))
     logging.info('Done with commit')
     logging.debug(str(git.push('origin', 'master')))
     logging.info('Done with push')
 else:
-    logging.debug(str(git.checkout(target_path)))
+    git.checkout(target_path)
     logging.info('Aborted and reverted')
 
 logging.info('-'*20)
