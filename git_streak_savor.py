@@ -26,6 +26,8 @@ current = datetime.today()
 
 logging.info(str(current))
 
+update = True
+
 for p in path_list:
     path = HOME_DIR + p
     logging.debug('before-->')
@@ -38,26 +40,28 @@ for p in path_list:
 
     git_time_str = re.search('\d{4}-\d{2}-\d{2}', str(git.log('-1', '--date=iso'))).group(0) # Magic line
     last_mod_time = datetime.strptime(git_time_str, '%Y-%m-%d')
+
     # Check if time diff
     if current.date() - last_mod_time.date() == timedelta(0):
         logging.info('Found a new mod path %s, abort update' % p)
-        exit(0)
+        update = False
 
-with open(target_path, 'a') as tfile:
-    tfile.write(str(current.date())+' ')
+if update:
+    with open(target_path, 'a') as tfile:
+        tfile.write(str(current.date())+' ')
 
-os.chdir(target_path.rsplit('/',1)[0])
+    os.chdir(target_path.rsplit('/',1)[0])
 
 
-if args.commit:
-    git.add(target_path)
-    logging.info('Done with add')
-    logging.debug(str(git.commit('-m', 'Keep streak on %s' % str(current.date()))))
-    logging.info('Done with commit')
-    logging.debug(str(git.push('origin', 'master')))
-    logging.info('Done with push')
-else:
-    git.checkout(target_path)
-    logging.info('Aborted and reverted')
+    if args.commit:
+        git.add(target_path)
+        logging.info('Done with add')
+        logging.debug(str(git.commit('-m', 'Keep streak on %s' % str(current.date()))))
+        logging.info('Done with commit')
+        logging.debug(str(git.push('origin', 'master')))
+        logging.info('Done with push')
+    else:
+        git.checkout(target_path)
+        logging.info('Aborted and reverted')
 
 logging.info('-'*20)
