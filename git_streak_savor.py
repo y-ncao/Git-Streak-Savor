@@ -19,7 +19,6 @@ args = arg_parser.parse_args()
 
 LOG_PATH = config_parser.get('Path', 'log_path')+'git_streak_savor.log'
 
-print LOG_PATH
 if args.verbose:
     logging.basicConfig(filename=LOG_PATH, level=logging.DEBUG)
 else:
@@ -42,9 +41,13 @@ for project in project_list:
 
     git.pull('origin', 'master')
     logging.info('Pulled %s' % project)
-
-    last_mod = git.log('-1', '--date=iso')
-    logging.debug(str(last_mod))
+    logging.debug('broke next')
+    try:
+        last_mod = git.log('-1', '--date=iso')
+    except:
+        logging.debug('has error')
+    logging.debug('Broked')
+    #logging.debug(str(last_mod))
     git_time_str = re.search('\d{4}-\d{2}-\d{2}', str(last_mod)).group(0) # Magic line
     last_mod_time = datetime.strptime(git_time_str, '%Y-%m-%d')
 
