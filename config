@@ -1,8 +1,0 @@
-[Path]
-main_path = /home/ycao/Documents/
-target_path = %(main_path)sjekyll-blog/_posts/2014-07-12-github-streak-savor.md
-log_path = /home/ycao/Dropbox/log/
-
-[Project]
-python_study = Python_Study
-jekyll_blog = jekyll-blog
