@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-import sh
 from datetime import datetime, timedelta
 from ConfigParser import SafeConfigParser
 
 import argparse
 import re
+import sh
 import logging
 
 
@@ -54,8 +54,10 @@ config_parser = SafeConfigParser()
 config_parser.read('config')
 
 arg_parser = argparse.ArgumentParser(description='Save my github streak.')
-arg_parser.add_argument('-c', '--commit', action='store_true', help='Actually commit the change (default: no)')
-arg_parser.add_argument('-v', '--verbose', action='store_true', help='Increase output verbosity')
+arg_parser.add_argument('-c', '--commit', action='store_true',
+                        help='Actually commit the change (default: no)')
+arg_parser.add_argument('-v', '--verbose', action='store_true',
+                        help='Increase output verbosity')
 args = arg_parser.parse_args()
 
 LOG_PATH = config_parser.get('Path', 'log_path') + 'git_streak_savor.log'
