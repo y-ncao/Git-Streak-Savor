@@ -1,6 +1,6 @@
 #!/bin/sh
 
-APPDIR=$HOME/Documents/
+APPDIR=$HOME/src/git/
 export PYTHONPATH=$APPDIR/Git-Streak-Savor:$APPDIR
 
 cd $APPDIR/Git-Streak-Savor
